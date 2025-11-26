@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joke Bro!</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #ffe6e6;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        transition: background-color 0.5s;
+    }
+
+    h1 {
+        color: #d63384;
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        padding: 0 20px;
+        max-width: 800px;
+        transition: all 0.3s;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    button {
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+        position: relative;
+    }
+
+    #evetBtn {
+        background-color: #28a745;
+        color: white;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+    }
+
+    #hayirBtn {
+        background-color: #dc3545;
+        color: white;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    }
+
+    /* Ayar Butonu */
+    #ayarButonu {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0.5;
+        z-index: 100;
+    }
+    #ayarButonu:hover { opacity: 1; }
+
+    #ayarPaneli {
+        display: none;
+        position: fixed;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        text-align: center;
+        z-index: 101;
+        width: 90%;
+        max-width: 350px;
+    }
+
+    #overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 100;
+    }
+
+    input {
+        width: 100%; padding: 10px; margin: 10px 0;
+        border: 1px solid #ddd; border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    .btn-blue { background: #007bff; color: white; width: 100%; margin-top: 5px; }
+    
+    .link-alani {
+        background: #eee;
+        padding: 10px;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        word-break: break-all;
+        display: none;
+    }
+
+    .link-alani a {
+        color: #0066ff;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+
+    .ikonlar {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .ikonlar img {
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: 0.2s;
+        background: #e9e9e9;
+        padding: 4px;
+    }
+
+    .ikonlar img:hover {
+        background: #d4d4d4;
+        transform: scale(1.1);
+    }
+
+    /* Konfetti */
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        top: 0;
+        left: 50%;
+        pointer-events: none;
+        opacity: 0.7;
+        z-index: 9999;
+        animation: fall 2s linear forwards;
+    }
+
+    @keyframes fall {
+        to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+</style>
+</head>
+<body>
+
+<div id="ayarButonu" onclick="ayarAc()">⚙️</div>
+
+<div id="overlay" onclick="ayarKapat()"></div>
+<div id="ayarPaneli">
+    <h3>Sorun Nedir?</h3>
+    <input type="text" id="soruInput" placeholder="Örn: Beni Affeder misin?">
+    <button class="btn-blue" onclick="linkYap()">Link Oluştur</button>
+    <div id="linkSonuc" class="link-alani">
+        <a id="olusanLinkA" href="#" target="_blank"></a>
+        <div class="ikonlar">
+            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828954.png" title="Paylaş" onclick="paylas()">
+            <img src="https://cdn-icons-png.flaticon.com/512/9070/9070501.png" title="Kopyala" onclick="kopyala()">
+            <img src="https://cdn-icons-png.flaticon.com/512/11102/11102083.png" title="Git / Dene" onclick="git()">
+        </div>
+    </div>
+    <button onclick="ayarKapat()" style="margin-top:10px; background:none; border:1px solid #ccc; color:#333; width:100%;">Kapat</button>
+</div>
+
+<h1 id="mesaj">Yükleniyor...</h1>
+<img id="gifResim" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDdtZ2JiZDR0a3lvMWF4OG8yc3p6Ymdvd3g2d245amdveDhyYmx6eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/cLS1cfxvGOPVpf9g3y/giphy.gif" style="width: 150px; display:none; margin-bottom: 20px;">
+
+<div class="buttons">
+    <button id="evetBtn" onclick="evetTiklandi()">EVET</button>
+    <button id="hayirBtn" onclick="hayirTiklandi()">HAYIR</button>
+</div>
+
+<script>
+let evetBoyutu = 1.2;
+let tiklamaSayisi = 0;
+let globalLink = "";
+
+const iknaSozleri = [
+    "Hadi ama...",
+    "Gerçekten mi?",
+    "Bir daha düşün istersen?",
+    "Üzülürüm bak...",
+    "Çok üzülürüm...",
+    "Ağlarım ama...",
+    "Şaka yapıyorsun değil mi?",
+    "Lütfeeeeen!",
+    "Kalbimi kırıyorsun 💔",
+    "Tamam artık Evet de!"
+];
+
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    const soru = params.get('s');
+    if(soru) {
+        document.getElementById('mesaj').innerText = soru;
+        document.getElementById('ayarButonu').style.display = 'none';
+    } else {
+        document.getElementById('mesaj').innerText = "metni yapılandırmak için sağ üstteki ayarlar simgesine dokun.";
+    }
+};
+
+function hayirTiklandi() {
+    tiklamaSayisi++;
+    const evetBtn = document.getElementById('evetBtn');
+
+    // Komik hareket: rastgele sağ/sol yukarı
+    if(Math.random() < 0.5){
+        evetBtn.style.transform = `translate(${Math.random()*100-50}px, ${Math.random()*50-25}px) scale(${1+Math.random()*0.3})`;
+    } else {
+        evetBtn.style.transform = `scale(${1 + Math.random()*0.5})`;
+    }
+
+    // Mesaj güncelle
+    const mesajYeri = document.getElementById('mesaj');
+    if(tiklamaSayisi <= iknaSozleri.length) {
+        mesajYeri.innerText = iknaSozleri[tiklamaSayisi-1];
+    } else {
+        mesajYeri.innerText = "EVET tuşu bozuldu bas artık! 😡";
+    }
+}
+
+function evetTiklandi() {
+    // Konfetti oluştur
+    for(let i=0;i<100;i++){
+        const c = document.createElement("div");
+        c.className = "confetti";
+        c.style.left = Math.random()*100 + "vw";
+        c.style.backgroundColor = `hsl(${Math.random()*360}, 100%, 50%)`;
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),2000);
+    }
+
+    document.body.innerHTML = `
+        <div style="text-align:center">
+            <h1 style="font-size:3rem; color:#28a745;">🎉 YAŞASIN! 🎉</h1>
+            <p style="font-size:1.5rem;">Doğru seçimi yaptın! ❤️</p>
+            <img src="https://media.giphy.com/media/T86i6yDyOYz7J6dPhf/giphy.gif" alt="Kalp" width="250">
+        </div>
+    `;
+    document.body.style.backgroundColor = "#e8f5e9";
+}
+
+// Ayar paneli
+function ayarAc() { document.getElementById('ayarPaneli').style.display='block'; document.getElementById('overlay').style.display='block'; }
+function ayarKapat() { document.getElementById('ayarPaneli').style.display='none'; document.getElementById('overlay').style.display='none'; }
+
+// Link oluşturma
+function linkYap() {
+    const metin = document.getElementById('soruInput').value;
+    if(!metin) return alert("Bir şeyler yazmalısın!");
+
+    globalLink = window.location.origin + window.location.pathname + "?s=" + encodeURIComponent(metin);
+    const sonucDiv = document.getElementById('linkSonuc');
+    sonucDiv.style.display = 'block';
+    const linkA = document.getElementById('olusanLinkA');
+    linkA.href = globalLink;
+    linkA.innerText = globalLink;
+    document.getElementById('mesaj').innerText = metin;
+}
+
+// Kopyala / Git / Paylaş
+function kopyala() {
+    navigator.clipboard.writeText(globalLink);
+    alert("Link kopyalandı!");
+}
+
+function git() {
+    window.open(globalLink,"_blank");
+}
+
+function paylas() {
+    if(navigator.share){
+        navigator.share({title:"Soru Linki",text:"Buna bak!😊",url:globalLink});
+    } else {
+        alert("Bu cihaz paylaşmayı desteklemiyor!");
+    }
+}
+</script>
+</body>
+</html>
